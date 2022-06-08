@@ -23,8 +23,9 @@ func main() {
 	})
 	http.HandleFunc("/upload_image", handler)
 	http.HandleFunc("/post", CreatePost)
-	fmt.Println("Server started on port 8080")
-	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
+	port := os.Getenv("PORT")
+	fmt.Println("Server started on port" + port)
+	http.ListenAndServe(":"+port, nil)
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {

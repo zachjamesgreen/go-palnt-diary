@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"mime/multipart"
 	"os"
 	"strings"
@@ -20,7 +21,7 @@ func createConfig() (s3Config *aws.Config) {
 
 	s3Config = &aws.Config{
 		Credentials: credentials.NewStaticCredentials(key, secret, ""), // Specifies your credentials.
-		Endpoint:    aws.String("https://sfo3.digitaloceanspaces.com"), // Find your endpoint in the control panel, under Settings. Prepend "https://".
+		Endpoint:    aws.String(os.Getenv("SPACES_URL")),               // Find your endpoint in the control panel, under Settings. Prepend "https://".
 		Region:      aws.String("sfo3"),                                // Must be "us-east-1" when creating new Spaces. Otherwise, use the region in your endpoint, such as "nyc3".
 	}
 	return
@@ -53,6 +54,7 @@ func UploadImage(fileName string, file multipart.File, contentType string, origi
 		fmt.Println(err.Error())
 		return "", err
 	}
+	log.Println("Uploaded image to S3 <spaces name> <original name> " + fileName + " " + originalName)
 	url = os.Getenv("SPACES_URL") + "/images/" + fileName
 	return
 }
@@ -101,6 +103,7 @@ func UploadPost(post *Post) (err error) {
 		fmt.Println(err.Error())
 		return
 	}
-	post.Url = "https://persephone.sfo3.digitaloceanspaces.com/posts/" + fmt.Sprintf("%d/%d/%d/", year, month, day) + post.Title + ".md"
+	log.Println("Uploaded post to S3 <spaces name> " + post.Title)
+	post.Url = os.Getenv("SPACES_URL") + "/posts/" + fmt.Sprintf("%d/%d/%d/", year, month, day) + post.Title + ".md"
 	return
 }
