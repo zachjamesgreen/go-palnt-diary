@@ -6,6 +6,7 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/google/uuid"
@@ -23,7 +24,7 @@ func main() {
 	http.HandleFunc("/upload_image", handler)
 	http.HandleFunc("/post", CreatePost)
 	fmt.Println("Server started on port 8080")
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
