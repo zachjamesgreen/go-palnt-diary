@@ -16,13 +16,13 @@ import (
 )
 
 func createConfig() (s3Config *aws.Config) {
-	key := os.Getenv("DO_SPACES_KEY")       // Access key pair. You can create access key pairs using the control panel or API.
-	secret := os.Getenv("DO_SPACES_SECRET") // Secret access key defined through an environment variable.
+	key := os.Getenv("DO_SPACES_KEY")
+	secret := os.Getenv("DO_SPACES_SECRET")
 
 	s3Config = &aws.Config{
-		Credentials: credentials.NewStaticCredentials(key, secret, ""), // Specifies your credentials.
-		Endpoint:    aws.String(os.Getenv("SPACES_URL")),               // Find your endpoint in the control panel, under Settings. Prepend "https://".
-		Region:      aws.String("sfo3"),                                // Must be "us-east-1" when creating new Spaces. Otherwise, use the region in your endpoint, such as "nyc3".
+		Credentials: credentials.NewStaticCredentials(key, secret, ""),
+		Endpoint:    aws.String(os.Getenv("SPACES_URL")),
+		Region:      aws.String("sfo3"),
 	}
 	return
 }
@@ -37,14 +37,13 @@ func UploadImage(fileName string, file multipart.File, contentType string, origi
 	}
 	s3Client := s3.New(newSession)
 
-	// Step 4: Define the parameters of the object you want to upload.
 	object := s3.PutObjectInput{
 		ContentType: aws.String(contentType),
-		Bucket:      aws.String("persephone/images/"), // The path to the directory you want to upload the object to, starting with your Space name.
-		Key:         aws.String(fileName),             // Object key, referenced whenever you want to access this file later.
-		Body:        file,                             // The object's contents.
-		ACL:         aws.String("public-read"),        // Defines Access-control List (ACL) permissions, such as private or public.
-		Metadata: map[string]*string{ // Required. Defines metadata tags.
+		Bucket:      aws.String("images/"),
+		Key:         aws.String(fileName),
+		Body:        file,
+		ACL:         aws.String("public-read"),
+		Metadata: map[string]*string{
 			"original-filename": aws.String(originalName),
 		},
 	}
@@ -76,7 +75,6 @@ func UploadPost(post *Post) (err error) {
 		fmt.Println(err.Error())
 		return
 	}
-	// ext := strings.Split(post.CoverImageFile.Filename, ".")[1]
 	ext := post.CoverImageFile.Filename[strings.LastIndex(post.CoverImageFile.Filename, "."):]
 	imageFileName := uuid.New().String() + "." + ext
 	imageUrl, err := UploadImage(imageFileName, image, post.CoverImageFile.Header["Content-Type"][0], post.CoverImageFile.Filename)
@@ -92,7 +90,7 @@ func UploadPost(post *Post) (err error) {
 		Key:         aws.String(post.Title + ".md"),
 		Body:        strings.NewReader(post.Body),
 		ACL:         aws.String("public-read"),
-		Metadata: map[string]*string{ // Required. Defines metadata tags.
+		Metadata: map[string]*string{
 			"id":    aws.String(post.ID),
 			"image": aws.String(post.CoverImage),
 		},

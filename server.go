@@ -13,9 +13,7 @@ import (
 )
 
 func main() {
-	// create a simple golang server
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// test path
 		fmt.Fprintf(w, "Hello World!")
 	})
 	http.HandleFunc("/alive", func(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +55,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func upload(fileHeader *multipart.FileHeader) (url string, err error) {
-	// fileExt := strings.Split(fileHeader.Filename, ".")[1]
 	fileExt := fileHeader.Filename[strings.LastIndex(fileHeader.Filename, "."):]
 	file, err := fileHeader.Open()
 	if err != nil {
